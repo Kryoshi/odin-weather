@@ -1,2 +1,2 @@
-# js-template
-Template Repository for Vanilla Javascript Web Apps using Webpack
+# odin-weather
+Project: Weather App for the Odin Project
