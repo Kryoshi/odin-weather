@@ -6,4 +6,7 @@ export default [
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
   eslintConfigPrettier,
+  {
+    ignores: ["webpack.*.js", "node_modules/", "dist/"],
+  },
 ];
