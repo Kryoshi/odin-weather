@@ -1,0 +1,2 @@
+weather_api/weather_conditions.json: https://www.weatherapi.com/docs/weather_conditions.json
+weather_api/icons: https://cdn.weatherapi.com/weather.zip
