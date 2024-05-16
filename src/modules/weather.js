@@ -19,7 +19,7 @@ class Weather {
     if (!this.#canRefresh()) {
       if (location == this.#location && this.#data) {
         return this.#data;
-      } else if (this.#matchCacheLocation() && this.#loadCache()) {
+      } else if (this.#loadCacheLocation() && this.#loadCache()) {
         return this.#data;
       }
     }
@@ -33,10 +33,29 @@ class Weather {
       }
     }
   }
+  async search(query) {
+    const locations = this.#fetchLocations(query);
+    if (locations && !locations.error) {
+      return locations;
+    }
+  }
+
+  async #fetchLocations(query) {
+    try {
+      const request_url = `http://api.weatherapi.com/v1/search.json?key=${API_KEY}&q=${query}`;
+      const response = await fetch(request_url, { mode: "cors" });
+      const weatherData = await response.json();
+
+      return weatherData;
+    } catch (error) {
+      this.#signalError(error.message);
+      return false;
+    }
+  }
 
   async #fetchData() {
     try {
-      const request_url = `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${this.#location}`;
+      const request_url = `http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${this.#location}&days=3`;
       const response = await fetch(request_url, { mode: "cors" });
       const weatherData = await response.json();
 
@@ -76,12 +95,13 @@ class Weather {
     }
   }
 
-  #matchCacheLocation() {
+  #loadCacheLocation() {
     if (storageAvailable) {
       const location = localStorage.getItem(STORAGE_KEYS.location);
       if (location == this.#location) {
         return true;
       } else {
+        this.#location = location;
         return false;
       }
     } else {
