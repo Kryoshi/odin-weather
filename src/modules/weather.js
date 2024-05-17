@@ -8,7 +8,7 @@ const STORAGE_KEYS = {
   location: "location",
   data: "data",
 };
-const REFRESH_MINUTES = 2.5;
+const REFRESH_MINUTES = 1;
 const REFRESH_INTERVAL = REFRESH_MINUTES * 60 * 1000; //(ms)
 
 class Weather {
@@ -17,20 +17,21 @@ class Weather {
 
   async getData(location) {
     if (!this.#canRefresh()) {
-      if (location == this.#location && this.#data) {
+      if (location === this.#location && this.#data) {
+        console.log("loading... from memory");
         return this.#data;
-      } else if (this.#loadCacheLocation() && this.#loadCache()) {
+      } else if (this.#matchCacheLocation(location) && this.#loadCache()) {
+        console.log("loading... from cache");
         return this.#data;
       }
     }
 
+    console.log("loading... from web");
     this.#location = location;
     const data = await this.#fetchData();
     if (data) {
-      if (this.#parseData(data)) {
-        this.#cacheData();
-        return this.#data;
-      }
+      this.#saveCache();
+      return this.#data;
     }
   }
   async search(query) {
@@ -59,64 +60,45 @@ class Weather {
       const response = await fetch(request_url, { mode: "cors" });
       const weatherData = await response.json();
 
-      return weatherData;
-    } catch (error) {
-      this.#signalError(error.message);
-      return false;
-    }
-  }
-
-  #parseData(data) {
-    try {
-      if (data.error) {
-        throw new Error(data.error.message);
-      }
-      this.#data = {
-        location: data.location.name,
-        country: data.location.country,
-        sun: data.current.is_day ? "day" : "night",
-        code: data.current.condition.code,
-        temp: {
-          current: {
-            f: data.current.temp_f,
-            c: data.current.temp_c,
-          },
-          feelslike: {
-            f: data.current.feelslike_f,
-            c: data.current.feelslike_c,
-          },
-        },
-        humidity: data.current.humidity,
-      };
-      return true;
-    } catch (error) {
-      this.#signalError(error.message);
-      return false;
-    }
-  }
-
-  #loadCacheLocation() {
-    if (storageAvailable) {
-      const location = localStorage.getItem(STORAGE_KEYS.location);
-      if (location == this.#location) {
-        return true;
+      if (weatherData.error) {
+        throw new Error(weatherData.error.message);
       } else {
-        this.#location = location;
-        return false;
+        this.#data = weatherData;
+        return true;
+      }
+    } catch (error) {
+      this.#signalError(error.message);
+      return false;
+    }
+  }
+
+  #matchCacheLocation(location) {
+    if (storageAvailable) {
+      const cacheLocation = localStorage.getItem(STORAGE_KEYS.location);
+      console.log(cacheLocation);
+      if (cacheLocation) {
+        if (location === cacheLocation) {
+          return true;
+        } else {
+          return false;
+        }
       }
     } else {
       this.#signalError("Browser does not allow cache");
-      return true;
+      return false;
     }
   }
 
   #canRefresh() {
     if (storageAvailable) {
       const time = localStorage.getItem(STORAGE_KEYS.timestamp);
-      if (Date.now() - time > REFRESH_INTERVAL) {
-        return true;
-      } else {
+
+      if (Date.now() - time < REFRESH_INTERVAL) {
+        console.log("no refresh");
         return false;
+      } else {
+        console.log("refresh");
+        return true;
       }
     } else {
       this.#signalError("Browser does not allow cache");
@@ -127,7 +109,8 @@ class Weather {
   #loadCache() {
     if (storageAvailable) {
       const data = localStorage.getItem(STORAGE_KEYS.data);
-      this.#data = data;
+      const dataObject = JSON.parse(data);
+      this.#data = dataObject;
       return true;
     } else {
       this.#signalError("Browser does not allow cache");
@@ -135,13 +118,22 @@ class Weather {
     }
   }
 
-  #cacheData() {
+  #saveCache() {
     if (storageAvailable) {
+      console.log("caching: " + Date.now());
       const dataString = JSON.stringify(this.#data);
 
       localStorage.setItem(STORAGE_KEYS.timestamp, Date.now());
       localStorage.setItem(STORAGE_KEYS.location, this.#location);
       localStorage.setItem(STORAGE_KEYS.data, dataString);
+    } else {
+      this.#signalError("Browser does not allow cache");
+    }
+  }
+
+  clearCache() {
+    if (storageAvailable) {
+      localStorage.clear();
     } else {
       this.#signalError("Browser does not allow cache");
     }
