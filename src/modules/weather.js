@@ -75,7 +75,6 @@ class Weather {
   #matchCacheLocation(location) {
     if (storageAvailable) {
       const cacheLocation = localStorage.getItem(STORAGE_KEYS.location);
-      console.log(cacheLocation);
       if (cacheLocation) {
         if (location === cacheLocation) {
           return true;
@@ -120,7 +119,6 @@ class Weather {
 
   #saveCache() {
     if (storageAvailable) {
-      console.log("caching: " + Date.now());
       const dataString = JSON.stringify(this.#data);
 
       localStorage.setItem(STORAGE_KEYS.timestamp, Date.now());
