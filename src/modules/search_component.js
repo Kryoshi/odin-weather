@@ -1,6 +1,6 @@
-export { SearchComponent };
+export { UISearchComponent };
 
-class SearchComponent {
+class UISearchComponent {
   element;
   #inputElement;
   #resultsElement;
@@ -136,7 +136,7 @@ class SearchComponent {
   updateResults(locations) {
     this.clearResults();
     for (let location of locations) {
-      const resultComponent = new ResultComponent(location);
+      const resultComponent = new UISearchResult(location);
       this.#resultsElement.append(resultComponent.element);
       this.#resultComponents.push(resultComponent);
     }
@@ -156,7 +156,7 @@ class SearchComponent {
   }
 }
 
-class ResultComponent {
+class UISearchResult {
   element;
   #submitButton;
   #textSpan;
