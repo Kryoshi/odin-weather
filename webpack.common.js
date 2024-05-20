@@ -28,9 +28,7 @@ module.exports = {
       template: "./src/index.html",
     }),
     new CopyPlugin({
-      patterns: [
-        { from: "./src/weather_api/icons/", to: "./weather_api/icons/" },
-      ],
+      patterns: [{ from: "./src/weather_api/icons/", to: "./weather_icons/" }],
     }),
   ],
 
