@@ -1,20 +1,29 @@
+import { createButton } from "./create_button";
+
 export { UISearchComponent };
 
 class UISearchComponent {
   element;
+  #lockButton;
   #inputElement;
   #resultsElement;
+
   #resultComponents = [];
   #selectedOptionIndex = -1;
+
+  #locationCache = "";
 
   constructor() {
     //Create elements
     this.element = document.createElement("div");
+    this.#lockButton = createButton("lock");
     this.#inputElement = document.createElement("input");
     this.#resultsElement = document.createElement("ul");
 
     //Set attributes
     this.element.className = "search";
+
+    this.#lockButton.className = "lock";
 
     this.#inputElement.className = "input";
     this.#inputElement.type = "text";
@@ -24,11 +33,19 @@ class UISearchComponent {
     this.#resultsElement.className = "results";
 
     //Append Elements
-    this.element.append(this.#inputElement, this.#resultsElement);
+    this.element.append(
+      this.#lockButton,
+      this.#inputElement,
+      this.#resultsElement,
+    );
 
     //Add listeners
-    this.element.addEventListener("submit-ui", () => {
+    this.element.addEventListener("submit-ui", async () => {
       this.escapeFocus();
+    });
+
+    this.#lockButton.addEventListener("click", () => {
+      this.toggleLock();
     });
 
     this.#inputElement.addEventListener("input", () => {
@@ -151,11 +168,23 @@ class UISearchComponent {
     removeChildren(this.#resultsElement);
   }
 
+  lockLocation(location) {
+    this.#locationCache = location;
+    this.toggleLock();
+  }
+
   toggleLock() {
     this.clearResults();
     this.element.classList.toggle("locked");
     this.#inputElement.disabled = !this.#inputElement.disabled;
-    this.element.blur();
+
+    if (this.element.classList.contains("locked")) {
+      this.element.blur();
+      this.#lockButton.blur();
+      this.#inputElement.value = this.#locationCache;
+    } else {
+      this.#inputElement.focus();
+    }
   }
 }
 
