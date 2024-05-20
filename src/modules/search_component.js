@@ -16,6 +16,7 @@ class UISearchComponent {
     //Set attributes
     this.element.className = "search";
 
+    this.#inputElement.className = "input";
     this.#inputElement.type = "text";
     this.#inputElement.minLength = 3;
     this.#inputElement.placeholder = "Location...";
@@ -31,13 +32,15 @@ class UISearchComponent {
     });
 
     this.#inputElement.addEventListener("input", () => {
-      if (this.#inputElement.value.length > 1) {
+      if (this.#inputElement.value.length > 2) {
         const event = new CustomEvent("search-query", {
           detail: this.#inputElement.value,
           bubbles: true,
         });
 
         this.element.dispatchEvent(event);
+      } else {
+        this.clearResults();
       }
     });
 
