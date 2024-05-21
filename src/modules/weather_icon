@@ -13,7 +13,7 @@ class UIWeatherIcon {
     this.element.className = "weather-icon";
 
     this.#imageElement.className = "image";
-    this.#imageElement.url = url;
+    this.#imageElement.src = url;
 
     this.element.append(this.#imageElement);
   }
