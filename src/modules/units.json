@@ -1,0 +1,10 @@
+{
+  "metric": {
+    "wind": "kph",
+    "temperature": "c"
+  },
+  "imperial": {
+    "wind": "mph",
+    "temperature": "f"
+  }
+}

@@ -1,3 +1,5 @@
+import UNITS from "./units.json";
+
 export { UITemperatureDisplay };
 
 class UITemperatureDisplay {
@@ -27,7 +29,6 @@ class UITemperatureDisplay {
     this.#unitsElement.className = "units";
     this.#celsiusButton.className = "celsius";
     this.#celsiusButton.textContent = "°C";
-    this.toggleUnit();
 
     this.#fahrenheitButton.className = "fahrenheit";
     this.#fahrenheitButton.textContent = "°F";
@@ -39,11 +40,8 @@ class UITemperatureDisplay {
     //Add listeners
     this.#unitsElement.addEventListener("click", (e) => {
       if (e.target.tagName === "BUTTON") {
-        if (e.target.classList.contains("celsius")) {
-          this.setCelsiusActive();
-        } else {
-          this.setFahrenheitActive();
-        }
+        const event = new CustomEvent("unit-toggle", { bubbles: true });
+        this.element.dispatchEvent(event);
       }
     });
   }
@@ -62,29 +60,27 @@ class UITemperatureDisplay {
     }
   }
 
-  setCelsiusActive() {
-    this.#activeUnit = "c";
+  setActiveUnits(units) {
+    this.#activeUnit = units.temperature;
+    this.updateUnitDisplay();
+  }
 
+  updateUnitDisplay() {
+    if (this.#activeUnit === UNITS.metric.temperature) {
+      this.setCelsiusActive();
+    } else {
+      this.setFahrenheitActive();
+    }
+    this.updateDisplay();
+  }
+
+  setCelsiusActive() {
     this.#celsiusButton.classList.add("active");
     this.#fahrenheitButton.classList.remove("active");
-
-    this.updateDisplay();
   }
 
   setFahrenheitActive() {
-    this.#activeUnit = "f";
-
     this.#fahrenheitButton.classList.add("active");
     this.#celsiusButton.classList.remove("active");
-
-    this.updateDisplay();
-  }
-
-  toggleUnit() {
-    if (this.#activeUnit === "c") {
-      this.setFahrenheitActive();
-    } else {
-      this.setCelsiusActive();
-    }
   }
 }
