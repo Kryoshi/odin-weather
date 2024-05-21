@@ -7,64 +7,99 @@ import { UIComponent } from "./modules/ui";
   const weather = new Weather();
   const uiInstance = new UIComponent();
 
-  uiInstance.window.addEventListener("search-query", async (e) => {
-    if (e.detail) {
-      const locations = await weather.search(e.detail);
+  initListeners();
 
-      if (locations) {
-        const locationNames = [];
-        for (let location of locations) {
-          const locationDetails = {
-            name: `${location.name}, ${location.country}`,
-            url: location.url,
-          };
-          locationNames.push(locationDetails);
+  if (await weather.loadData()) {
+    const event = new Event("load-success");
+    uiInstance.window.dispatchEvent(event);
+  }
+
+  function initListeners() {
+    uiInstance.window.addEventListener("search-query", async (e) => {
+      if (e.detail) {
+        const counter = weather.searchCounter;
+        const locations = await weather.search(e.detail);
+        if (counter !== weather.searchCounter - 1) {
+          return;
         }
 
-        const event = new CustomEvent("search-query-success", {
-          detail: locationNames,
-        });
-        uiInstance.window.dispatchEvent(event);
+        if (locations) {
+          const locationNames = [];
+          for (let location of locations) {
+            const locationDetails = location.region
+              ? {
+                  name: `${location.name}, ${location.region}, ${location.country}`,
+                  url: location.url,
+                }
+              : {
+                  name: `${location.name}, ${location.country}`,
+                  url: location.url,
+                };
+            locationNames.push(locationDetails);
+          }
+
+          const event = new CustomEvent("search-query-success", {
+            detail: locationNames,
+          });
+          uiInstance.window.dispatchEvent(event);
+        }
       }
-    }
-  });
+    });
 
-  uiInstance.window.addEventListener("search-submit", async (e) => {
-    if (e.detail) {
-      const locations = await weather.search(e.detail);
+    uiInstance.window.addEventListener("search-submit", async (e) => {
+      if (e.detail) {
+        const locations = await weather.search(e.detail);
 
-      if (locations[0]) {
-        const url = locations[0].url;
+        if (locations[0]) {
+          const url = locations[0].url;
 
-        const event = new CustomEvent("submit-location", {
-          detail: url,
-        });
-        uiInstance.window.dispatchEvent(event);
+          const event = new CustomEvent("submit-location", {
+            detail: url,
+          });
+          uiInstance.window.dispatchEvent(event);
+        }
       }
-    }
-  });
+    });
 
-  uiInstance.window.addEventListener("submit-location", async (e) => {
-    if (e.detail) {
-      const url = e.detail;
+    uiInstance.window.addEventListener("submit-location", async (e) => {
+      if (e.detail) {
+        const url = e.detail;
 
-      console.log(url);
+        console.log(url);
 
-      const data = await weather.getData(url);
-
-      if (data) {
-        const event = new CustomEvent("load-success", {
-          detail: data,
-        });
-        uiInstance.window.dispatchEvent(event);
+        if (await weather.loadData(url)) {
+          const event = new Event("load-success");
+          uiInstance.window.dispatchEvent(event);
+        }
       }
-    }
-  });
+    });
 
-  uiInstance.window.addEventListener("load-success", (e) => {
-    if (e.detail) {
+    uiInstance.window.addEventListener("load-success", async () => {
       console.log("success");
-      console.log(e.detail);
-    }
-  });
+      const dashboardUpdate = {};
+
+      const iconURL = await weather.getIconURL();
+      const location = await weather.getLocation();
+      const temperature = await weather.getCurrentTemperature();
+      const miscData = await weather.getWeatherMiscData();
+
+      if (iconURL) {
+        dashboardUpdate.iconURL = iconURL;
+      }
+
+      if (location) {
+        dashboardUpdate.location = location;
+      }
+
+      if (temperature) {
+        dashboardUpdate.temperature = temperature;
+      }
+
+      if (miscData) {
+        dashboardUpdate.miscData = miscData;
+      }
+
+      uiInstance.updateDashboard(dashboardUpdate);
+    });
+  }
 })();
