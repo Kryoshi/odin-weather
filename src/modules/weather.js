@@ -43,6 +43,7 @@ class Weather {
 
   async getWeatherMiscData() {
     if (await this.loadData()) {
+      const isDay = this.#data.current.is_day;
       const condition = this.#data.current.condition.text;
       const feelsLike = {
         c: this.#data.current.feelslike_c,
@@ -54,7 +55,7 @@ class Weather {
       };
       const humidity = this.#data.current.humidity;
 
-      return { condition, feelsLike, wind, humidity };
+      return { isDay, condition, feelsLike, wind, humidity };
     }
   }
 
