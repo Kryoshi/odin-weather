@@ -8,15 +8,15 @@
   font-size: 16px;
 }
 
-:root .theme-light {
-  --color-theme-main: #e5e5e5;
+:root {
+  --color-theme-main: #e5e5e560;
   --color-theme-bg: #d6d3d1;
   --color-theme-shadow: #a3a3a3;
   --color-theme-border: #a3a3a3;
   --color-theme-highlight: #22d3ee;
-  --color-theme-highlight-bg: #cffafe80;
+  --color-theme-highlight-bg: #cffafe40;
   --color-theme-focus: #334155;
-  --color-theme-focus-bg: #fafafa;
+  --color-theme-focus-bg: #f3f4f6;
 
   --color-theme-text-main: #09090b;
   --color-theme-text-alt: #52525b;
@@ -26,21 +26,6 @@
   --color-theme-positive: #86efac;
   --color-theme-mixed: #f59e0b;
   --color-theme-negative: #f87171;
-}
-
-:root .theme-dark {
-  --color-theme-main: #0c0a09;
-  --color-theme-bg: #09090b;
-  --color-theme-shadow: #6b7280;
-
-  --color-theme-text-main: #fafaf9;
-  --color-theme-text-alt: #e5e7eb;
-
-  --color-theme-user: #059669;
-
-  --color-theme-positive: #059669;
-  --color-theme-mixed: #f59e0b;
-  --color-theme-negative: #ef4444;
 }
 
 h1,
@@ -155,29 +140,44 @@ body {
   background-image: url(img/water-percent.svg);
 }
 
-#window {
-  height: 100%;
+body {
   background-color: var(--color-theme-bg);
-
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-rows: 1fr min-content;
   align-items: center;
+  justify-items: center;
+}
+
+#background {
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+  position: fixed;
+  background-image: url(img/background.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#window {
+  width: clamp(80ch, 60%, 120ch);
 }
 
 .dashboard {
-  width: clamp(80ch, 60%, 120ch);
   background-color: var(--color-theme-main);
   padding: 1rem;
   border-radius: 1rem;
 
   display: grid;
   justify-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 @media (max-width: 800px) {
-  .dashboard {
+  #window {
     width: 100%;
+  }
+
+  .dashboard {
     border-radius: 0;
   }
 }
@@ -187,7 +187,9 @@ body {
   border-bottom: 1px solid var(--color-theme-border);
 
   &:focus-within {
-    background-color: var(--color-theme-focus-bg);
+    .results {
+      background-color: var(--color-theme-focus-bg);
+    }
 
     & > * {
       outline: 1px solid var(--color-theme-focus);
@@ -229,7 +231,7 @@ body {
     height: 5rem;
     font-size: 3rem;
     border-radius: inherit;
-    padding: 1rem;
+    padding: 0.5rem;
     text-align: center;
   }
 
@@ -358,4 +360,11 @@ body {
       }
     }
   }
+}
+
+#footer {
+  height: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

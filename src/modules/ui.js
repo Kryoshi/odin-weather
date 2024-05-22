@@ -1,11 +1,15 @@
 import UNITS from "./units.json";
 import { UIDashboard } from "./dashboard";
+import { UIBackground } from "./background";
+import { UIFooter } from "./footer";
 
 export { UIComponent };
 
 class UIComponent {
   window;
+  #background;
   #dashboard;
+  #footer;
   #displayUnits = UNITS.metric;
 
   constructor() {
@@ -13,6 +17,8 @@ class UIComponent {
 
     //Create elements
     this.window = document.createElement("div");
+    this.#background = new UIBackground();
+    this.#footer = new UIFooter();
 
     this.#dashboard = new UIDashboard();
 
@@ -22,7 +28,7 @@ class UIComponent {
 
     //Append Elements
     this.window.append(this.#dashboard.element);
-    body.append(this.window);
+    body.append(this.#background.element, this.window, this.#footer.element);
 
     //Add listeners
     this.window.addEventListener("search-query-success", (e) => {
