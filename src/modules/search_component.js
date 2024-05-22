@@ -46,7 +46,7 @@ class UISearchComponent {
     );
 
     //Add listeners
-    this.element.addEventListener("submit-ui", async () => {
+    this.element.addEventListener("submit-ui", () => {
       this.escapeFocus();
     });
 
