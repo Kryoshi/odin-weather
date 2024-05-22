@@ -211,6 +211,7 @@ class UISearchComponent {
     this.element.classList.remove("locked");
     this.#inputElement.disabled = false;
     this.#inputElement.focus();
+    this.#inputElement.value = "";
   }
 }
 
