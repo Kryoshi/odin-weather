@@ -22,4 +22,12 @@ class UIWeatherIcon {
     this.#imageURL = url;
     this.#imageElement.src = this.#imageURL;
   }
+
+  startLoader() {
+    this.element.classList.add("loader");
+  }
+
+  stopLoader() {
+    this.element.classList.remove("loader");
+  }
 }

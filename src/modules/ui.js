@@ -46,6 +46,10 @@ class UIComponent {
 
       this.#dashboard.setUnits(this.#displayUnits);
     });
+
+    this.window.addEventListener("load-start", () => {
+      this.#dashboard.startLoading();
+    });
   }
 
   updateDashboard({ iconURL, location, temperature, miscData } = {}) {

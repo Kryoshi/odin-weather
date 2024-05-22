@@ -4,13 +4,22 @@ import { Weather } from "./modules/weather";
 import { UIComponent } from "./modules/ui";
 
 (async () => {
+  const loader = document.querySelector(".pre-loader");
+  loader.remove();
+
   const weather = new Weather();
   const uiInstance = new UIComponent();
 
   initListeners();
 
+  signalLoadStart();
   if (await weather.loadData()) {
     const event = new Event("load-success");
+    uiInstance.window.dispatchEvent(event);
+  }
+
+  function signalLoadStart() {
+    const event = new Event("load-start");
     uiInstance.window.dispatchEvent(event);
   }
 
@@ -48,6 +57,7 @@ import { UIComponent } from "./modules/ui";
 
     uiInstance.window.addEventListener("search-submit", async (e) => {
       if (e.detail) {
+        signalLoadStart();
         const locations = await weather.search(e.detail);
 
         if (locations[0]) {
@@ -65,6 +75,7 @@ import { UIComponent } from "./modules/ui";
       if (e.detail) {
         const url = e.detail;
 
+        signalLoadStart();
         if (await weather.loadData(url)) {
           const event = new Event("load-success");
           uiInstance.window.dispatchEvent(event);
@@ -73,7 +84,6 @@ import { UIComponent } from "./modules/ui";
     });
 
     uiInstance.window.addEventListener("load-success", async () => {
-      console.log("success");
       const dashboardUpdate = {};
 
       const iconURL = await weather.getIconURL();
@@ -102,6 +112,7 @@ import { UIComponent } from "./modules/ui";
   }
 
   uiInstance.window.addEventListener("refresh", async () => {
+    signalLoadStart();
     if (await weather.refresh()) {
       const event = new Event("load-success");
       uiInstance.window.dispatchEvent(event);

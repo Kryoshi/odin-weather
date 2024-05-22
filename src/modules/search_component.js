@@ -184,7 +184,7 @@ class UISearchComponent {
 
   lockLocation(location) {
     this.#locationCache = location;
-    this.toggleLock();
+    this.lock();
   }
 
   toggleLock() {

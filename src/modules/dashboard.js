@@ -34,8 +34,17 @@ class UIDashboard {
     );
   }
 
+  startLoading() {
+    this.weatherIcon.startLoader();
+  }
+
+  stopLoading() {
+    this.weatherIcon.stopLoader();
+  }
+
   updateIcon(url) {
     this.weatherIcon.setURL(url);
+    this.stopLoading();
   }
 
   updateSearch(results) {
