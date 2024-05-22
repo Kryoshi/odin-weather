@@ -184,7 +184,6 @@ class Weather {
     if (storageAvailable) {
       const cacheLocation = localStorage.getItem(STORAGE_KEYS.location);
       if (cacheLocation) {
-        console.log(cacheLocation);
         this.#locationURL = cacheLocation;
         return true;
       } else {
