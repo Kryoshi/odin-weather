@@ -4,6 +4,8 @@ export { UISearchComponent };
 
 class UISearchComponent {
   element;
+  #buttonsElement;
+  #refreshButton;
   #lockButton;
   #inputElement;
   #resultsElement;
@@ -16,14 +18,16 @@ class UISearchComponent {
   constructor() {
     //Create elements
     this.element = document.createElement("div");
+    this.#buttonsElement = document.createElement("div");
     this.#lockButton = createButton("lock");
+    this.#refreshButton = createButton("refresh");
     this.#inputElement = document.createElement("input");
     this.#resultsElement = document.createElement("ul");
 
     //Set attributes
     this.element.className = "search";
 
-    this.#lockButton.className = "lock";
+    this.#buttonsElement.className = "buttons";
 
     this.#inputElement.className = "input";
     this.#inputElement.type = "text";
@@ -33,8 +37,10 @@ class UISearchComponent {
     this.#resultsElement.className = "results";
 
     //Append Elements
+
+    this.#buttonsElement.append(this.#refreshButton, this.#lockButton);
     this.element.append(
-      this.#lockButton,
+      this.#buttonsElement,
       this.#inputElement,
       this.#resultsElement,
     );
@@ -42,6 +48,14 @@ class UISearchComponent {
     //Add listeners
     this.element.addEventListener("submit-ui", async () => {
       this.escapeFocus();
+    });
+
+    this.#refreshButton.addEventListener("click", () => {
+      this.lock();
+      const event = new Event("refresh", {
+        bubbles: true,
+      });
+      this.element.dispatchEvent(event);
     });
 
     this.#lockButton.addEventListener("click", () => {
@@ -174,17 +188,29 @@ class UISearchComponent {
   }
 
   toggleLock() {
-    this.clearResults();
-    this.element.classList.toggle("locked");
-    this.#inputElement.disabled = !this.#inputElement.disabled;
-
     if (this.element.classList.contains("locked")) {
-      this.element.blur();
-      this.#lockButton.blur();
-      this.#inputElement.value = this.#locationCache;
+      this.unlock();
     } else {
-      this.#inputElement.focus();
+      this.lock();
     }
+  }
+
+  lock() {
+    this.clearResults();
+    this.element.classList.add("locked");
+    this.#inputElement.disabled = true;
+
+    this.element.blur();
+    this.#lockButton.blur();
+    this.#refreshButton.blur();
+    this.#inputElement.value = this.#locationCache;
+  }
+
+  unlock() {
+    this.clearResults();
+    this.element.classList.remove("locked");
+    this.#inputElement.disabled = false;
+    this.#inputElement.focus();
   }
 }
 

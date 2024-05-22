@@ -100,4 +100,11 @@ import { UIComponent } from "./modules/ui";
       uiInstance.updateDashboard(dashboardUpdate);
     });
   }
+
+  uiInstance.window.addEventListener("refresh", async () => {
+    if (await weather.refresh()) {
+      const event = new Event("load-success");
+      uiInstance.window.dispatchEvent(event);
+    }
+  });
 })();

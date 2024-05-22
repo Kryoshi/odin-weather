@@ -77,23 +77,52 @@ class Weather {
       }
     }
 
-    if (!this.#canRefresh()) {
-      if (locationURL === this.#locationURL && this.#data) {
-        console.log("loading... from memory");
-        return true;
-      } else if (this.#matchCacheLocation(locationURL) && this.#loadCache()) {
-        console.log("loading... from cache");
-        return true;
+    if (this.#localLoad(locationURL)) {
+      return true;
+    }
+
+    if (await this.#webLoad(locationURL)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async refresh() {
+    let locationURL = this.#locationURL;
+    if (!locationURL) {
+      if (this.#loadCacheLocation()) {
+        locationURL = this.#locationURL;
       }
     }
 
-    console.log("loading... from web");
+    if (locationURL) {
+      if (await this.#webLoad(locationURL)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  #localLoad(locationURL) {
+    if (!this.#canRefresh()) {
+      if (locationURL === this.#locationURL && this.#data) {
+        return true;
+      } else if (this.#matchCacheLocation(locationURL) && this.#loadCache()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async #webLoad(locationURL) {
     this.#locationURL = locationURL;
     const data = await this.#fetchData();
     if (data) {
       this.#saveCache();
       return true;
     }
+    return false;
   }
 
   async search(query) {

@@ -112,6 +112,10 @@ body {
   height: 100%;
 }
 
+.refresh .icon {
+  background-image: url(img/refresh.svg);
+}
+
 .lock .icon {
   background-image: url(img/lock-open.svg);
 }
@@ -199,7 +203,8 @@ body {
       background-color: var(--color-theme-focus-bg);
     }
 
-    & > * {
+    & .input,
+    .results {
       outline: 1px solid var(--color-theme-focus);
     }
 
@@ -216,17 +221,28 @@ body {
     }
   }
 
-  .lock {
+  .buttons {
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
 
-    width: 2rem;
-    height: 2rem;
-    padding: 0.2rem;
+    display: grid;
+    grid-auto-flow: column;
+    column-gap: 0.5rem;
 
-    border: 1px solid var(--color-theme-border);
-    border-radius: 0.2rem;
+    button {
+      width: 2rem;
+      height: 2rem;
+      padding: 0.2rem;
+
+      border: 1px solid var(--color-theme-border);
+      border-radius: 0.2rem;
+    }
+
+    button:hover,
+    button:active {
+      background-color: var(--color-theme-highlight-bg);
+    }
   }
 
   &.locked {
@@ -261,7 +277,8 @@ body {
     }
 
     .option {
-      &:hover {
+      &:hover,
+      &:active {
         background-color: var(--color-theme-highlight-bg);
       }
       button {
