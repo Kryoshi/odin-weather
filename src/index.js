@@ -65,8 +65,6 @@ import { UIComponent } from "./modules/ui";
       if (e.detail) {
         const url = e.detail;
 
-        console.log(url);
-
         if (await weather.loadData(url)) {
           const event = new Event("load-success");
           uiInstance.window.dispatchEvent(event);
