@@ -54,8 +54,10 @@ class Weather {
         mph: this.#data.current.wind_mph,
       };
       const humidity = this.#data.current.humidity;
+      const sunrise = this.#data.forecast.forecastday[0].astro.sunrise;
+      const sunset = this.#data.forecast.forecastday[0].astro.sunset;
 
-      return { isDay, condition, feelsLike, wind, humidity };
+      return { isDay, condition, feelsLike, wind, humidity, sunrise, sunset };
     }
   }
 

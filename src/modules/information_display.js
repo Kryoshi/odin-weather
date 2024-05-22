@@ -6,9 +6,11 @@ class UIInformationDisplay {
   feelsLikeComponent;
   windComponent;
   humidityComponent;
+  sunriseComponent;
+  sunsetComponent;
 
   activeUnits = {};
-  data; //{isDay, condition, feelsLikeTemperature {c: , f: ,}, wind {kph: , mph: ,}, humidity,}
+  data; //{isDay, condition, feelsLikeTemperature {c: , f: ,}, wind {kph: , mph: ,}, humidity, sunrise, sunset}
 
   constructor() {
     //Create Elements
@@ -18,6 +20,8 @@ class UIInformationDisplay {
     this.feelsLikeComponent = new UIInformationComponent("feels-like");
     this.windComponent = new UIInformationComponent("wind");
     this.humidityComponent = new UIInformationComponent("humidity");
+    this.sunriseComponent = new UIInformationComponent("sunrise");
+    this.sunsetComponent = new UIInformationComponent("sunset");
 
     //Set Attributes
     this.element.className = "weather-info";
@@ -25,6 +29,8 @@ class UIInformationDisplay {
     this.feelsLikeComponent.setLabel("Feels Like: ");
     this.windComponent.setLabel("Wind Speed: ");
     this.humidityComponent.setLabel("Humidity: ");
+    this.sunriseComponent.setLabel("Sunrise: ");
+    this.sunsetComponent.setLabel("Sunset: ");
 
     //Append Elements
     this.element.append(
@@ -32,6 +38,8 @@ class UIInformationDisplay {
       this.feelsLikeComponent.element,
       this.windComponent.element,
       this.humidityComponent.element,
+      this.sunriseComponent.element,
+      this.sunsetComponent.element,
     );
   }
 
@@ -60,6 +68,8 @@ class UIInformationDisplay {
         " " +
         this.activeUnits.wind.toUpperCase();
       const humidity = `${this.data.humidity}%`;
+      const sunrise = this.data.sunrise;
+      const sunset = this.data.sunset;
 
       this.conditionComponent.addClass(addStatus);
       this.conditionComponent.removeClass(removeStatus);
@@ -68,6 +78,8 @@ class UIInformationDisplay {
       this.feelsLikeComponent.setContent(feelsLike);
       this.windComponent.setContent(wind);
       this.humidityComponent.setContent(humidity);
+      this.sunriseComponent.setContent(sunrise);
+      this.sunsetComponent.setContent(sunset);
     }
   }
 }

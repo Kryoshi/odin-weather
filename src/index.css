@@ -140,6 +140,14 @@ body {
   background-image: url(img/water-percent.svg);
 }
 
+.sunrise .icon {
+  background-image: url(img/weather-sunset-up.svg);
+}
+
+.sunset .icon {
+  background-image: url(img/weather-sunset-down.svg);
+}
+
 body {
   background-color: var(--color-theme-bg);
   display: grid;
