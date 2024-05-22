@@ -1,4 +1,4 @@
-import { UIWeatherIcon } from "./weather_icon";
+import { UIWeatherIcon } from "./weather_icon.js";
 import { UISearchComponent } from "./search_component";
 import { UITemperatureDisplay } from "./temperature_display";
 import { UIInformationDisplay } from "./information_display";
