@@ -83,7 +83,7 @@ import { UIComponent } from "./modules/ui";
     uiInstance.window.addEventListener("load-success", async () => {
       const dashboardUpdate = {};
 
-      const iconURL = await weather.getIconURL();
+      const iconURL = await weather.getCurrentIconURL();
       const location = await weather.getLocation();
       const temperature = await weather.getCurrentTemperature();
       const miscData = await weather.getWeatherMiscData();

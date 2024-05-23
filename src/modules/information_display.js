@@ -8,9 +8,21 @@ class UIInformationDisplay {
   humidityComponent;
   sunriseComponent;
   sunsetComponent;
+  rainChanceComponent;
+  snowChanceComponent;
 
   activeUnits = {};
-  data; //{isDay, condition, feelsLikeTemperature {c: , f: ,}, wind {kph: , mph: ,}, humidity, sunrise, sunset}
+  data;
+  /** {
+    isDay,
+    condition,
+    feelsLikeTemperature {c: , f: ,},
+    wind {kph: , mph: ,},
+    humidity,
+    sunrise,
+    sunset,
+    precipitationChance,
+  } **/
 
   constructor() {
     //Create Elements
@@ -22,6 +34,8 @@ class UIInformationDisplay {
     this.humidityComponent = new UIInformationComponent("humidity");
     this.sunriseComponent = new UIInformationComponent("sunrise");
     this.sunsetComponent = new UIInformationComponent("sunset");
+    this.rainChanceComponent = new UIInformationComponent("rain-chance");
+    this.snowChanceComponent = new UIInformationComponent("snow-chance");
 
     //Set Attributes
     this.element.className = "weather-info";
@@ -31,6 +45,8 @@ class UIInformationDisplay {
     this.humidityComponent.setLabel("Humidity: ");
     this.sunriseComponent.setLabel("Sunrise: ");
     this.sunsetComponent.setLabel("Sunset: ");
+    this.rainChanceComponent.setLabel("Chance of Rain: ");
+    this.snowChanceComponent.setLabel("Chance of Snow: ");
 
     //Append Elements
     this.element.append(
@@ -40,6 +56,8 @@ class UIInformationDisplay {
       this.humidityComponent.element,
       this.sunriseComponent.element,
       this.sunsetComponent.element,
+      this.rainChanceComponent.element,
+      this.snowChanceComponent.element,
     );
   }
 
@@ -70,6 +88,8 @@ class UIInformationDisplay {
       const humidity = `${this.data.humidity}%`;
       const sunrise = this.data.sunrise;
       const sunset = this.data.sunset;
+      const rainChance = `${this.data.precipitationChance.rain}%`;
+      const snowChance = `${this.data.precipitationChance.snow}%`;
 
       this.conditionComponent.addClass(addStatus);
       this.conditionComponent.removeClass(removeStatus);
@@ -80,6 +100,8 @@ class UIInformationDisplay {
       this.humidityComponent.setContent(humidity);
       this.sunriseComponent.setContent(sunrise);
       this.sunsetComponent.setContent(sunset);
+      this.rainChanceComponent.setContent(rainChance);
+      this.snowChanceComponent.setContent(snowChance);
     }
   }
 }

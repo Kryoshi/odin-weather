@@ -11,10 +11,14 @@ const STORAGE_KEYS = {
 };
 const REFRESH_MINUTES = 1;
 const REFRESH_INTERVAL = REFRESH_MINUTES * 60 * 1000; //(ms)
+const DAILY_HOURS = 24;
+const HOUR_SECONDS = 3600;
+const FORECAST_DAYS = 3;
 
 class Weather {
   #data;
   #locationURL;
+  #epoch_seconds;
   searchCounter = 0;
 
   async getLocation() {
@@ -29,15 +33,9 @@ class Weather {
     }
   }
 
-  async getIconURL() {
+  async getCurrentIconURL() {
     if (await this.loadData()) {
-      const dayStatus = this.#data.current.is_day ? "day" : "night";
-      const iconCode =
-        WEATHERCONDITIONS[this.#data.current.condition.code].icon;
-
-      const iconURL = `./weather_icons/${dayStatus}/${iconCode}.png`;
-
-      return iconURL;
+      return this.#generateIconURL(this.#data.current);
     }
   }
 
@@ -56,8 +54,41 @@ class Weather {
       const humidity = this.#data.current.humidity;
       const sunrise = this.#data.forecast.forecastday[0].astro.sunrise;
       const sunset = this.#data.forecast.forecastday[0].astro.sunset;
+      const precipitationChance = await this.getCurrentPrecipitationChance();
 
-      return { isDay, condition, feelsLike, wind, humidity, sunrise, sunset };
+      return {
+        isDay,
+        condition,
+        feelsLike,
+        wind,
+        humidity,
+        sunrise,
+        sunset,
+        precipitationChance,
+      };
+    }
+  }
+
+  async getCurrentPrecipitationChance() {
+    if (await this.loadData()) {
+      const precipitationChance = {};
+
+      const day = 0;
+      for (let hour = 0; hour < DAILY_HOURS; ++hour) {
+        let currentForecast = this.#data.forecast.forecastday[day].hour[hour];
+
+        if (
+          this.#epoch_seconds - HOUR_SECONDS / 2 <
+          currentForecast.time_epoch
+        ) {
+          console.log(currentForecast.time);
+          precipitationChance.rain = currentForecast.chance_of_rain;
+          precipitationChance.snow = currentForecast.chance_of_snow;
+          break;
+        }
+      }
+
+      return precipitationChance;
     }
   }
 
@@ -68,6 +99,15 @@ class Weather {
         return aqi;
       }
     }
+  }
+
+  #generateIconURL(forecastData) {
+    const dayStatus = forecastData.is_day ? "day" : "night";
+    const iconCode = WEATHERCONDITIONS[forecastData.condition.code].icon;
+
+    const iconURL = `./weather_icons/${dayStatus}/${iconCode}.png`;
+
+    return iconURL;
   }
 
   async loadData(locationURL = this.#locationURL) {
@@ -135,7 +175,10 @@ class Weather {
 
   async #fetchLocations(query) {
     try {
-      const request_url = `http://api.weatherapi.com/v1/search.json?key=${API_KEY}&q=${query}`;
+      const request_url =
+        "http://api.weatherapi.com/v1/search.json?" +
+        `key=${API_KEY}` +
+        `&q=${query}`;
       const response = await fetch(request_url, { mode: "cors" });
       const locationData = await response.json();
 
@@ -148,7 +191,12 @@ class Weather {
 
   async #fetchData() {
     try {
-      const request_url = `http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${this.#locationURL}&days=3&aqi=yes`;
+      const request_url =
+        "http://api.weatherapi.com/v1/forecast.json?" +
+        `key=${API_KEY}` +
+        `&q=${this.#locationURL}` +
+        `&days=${FORECAST_DAYS}` +
+        `&aqi=yes`;
       const response = await fetch(request_url, { mode: "cors" });
       const weatherData = await response.json();
 
@@ -197,9 +245,9 @@ class Weather {
 
   #canRefresh() {
     if (storageAvailable) {
-      const time = localStorage.getItem(STORAGE_KEYS.timestamp);
+      const cacheTimestamp = localStorage.getItem(STORAGE_KEYS.timestamp);
 
-      if (Date.now() - time < REFRESH_INTERVAL) {
+      if (Date.now() - cacheTimestamp < REFRESH_INTERVAL) {
         return false;
       } else {
         return true;
@@ -212,8 +260,11 @@ class Weather {
 
   #loadCache() {
     if (storageAvailable) {
-      const data = localStorage.getItem(STORAGE_KEYS.data);
-      const dataObject = JSON.parse(data);
+      const cacheTimestamp = localStorage.getItem(STORAGE_KEYS.timestamp);
+      const dataString = localStorage.getItem(STORAGE_KEYS.data);
+      const dataObject = JSON.parse(dataString);
+
+      this.#epoch_seconds = Math.floor(cacheTimestamp / 1000);
       this.#data = dataObject;
       return true;
     } else {
@@ -225,8 +276,10 @@ class Weather {
   #saveCache() {
     if (storageAvailable) {
       const dataString = JSON.stringify(this.#data);
+      const cacheTimestamp = Date.now();
+      this.#epoch_seconds = Math.floor(cacheTimestamp / 1000);
 
-      localStorage.setItem(STORAGE_KEYS.timestamp, Date.now());
+      localStorage.setItem(STORAGE_KEYS.timestamp, cacheTimestamp);
       localStorage.setItem(STORAGE_KEYS.location, this.#locationURL);
       localStorage.setItem(STORAGE_KEYS.data, dataString);
     } else {

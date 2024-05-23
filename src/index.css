@@ -152,6 +152,14 @@ body {
   background-image: url(img/weather-sunset-down.svg);
 }
 
+.rain-chance .icon {
+  background-image: url(img/weather-rainy.svg);
+}
+
+.snow-chance .icon {
+  background-image: url(img/weather-snowy.svg);
+}
+
 body {
   background-color: var(--color-theme-bg);
   display: grid;
