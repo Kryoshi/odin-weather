@@ -18,11 +18,6 @@ import { UIComponent } from "./modules/ui";
     uiInstance.window.dispatchEvent(event);
   }
 
-  function signalLoadStart() {
-    const event = new Event("load-start");
-    uiInstance.window.dispatchEvent(event);
-  }
-
   function initListeners() {
     uiInstance.window.addEventListener("search-query", async (e) => {
       if (e.detail) {
@@ -67,6 +62,8 @@ import { UIComponent } from "./modules/ui";
             detail: url,
           });
           uiInstance.window.dispatchEvent(event);
+        } else {
+          signalError("No matching location found");
         }
       }
     });
@@ -118,4 +115,14 @@ import { UIComponent } from "./modules/ui";
       uiInstance.window.dispatchEvent(event);
     }
   });
+
+  function signalLoadStart() {
+    const event = new Event("load-start");
+    uiInstance.window.dispatchEvent(event);
+  }
+
+  function signalError(message) {
+    const event = new CustomEvent("display-error", { detail: message });
+    uiInstance.window.dispatchEvent(event);
+  }
 })();
