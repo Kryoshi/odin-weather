@@ -137,9 +137,9 @@ class Weather {
     try {
       const request_url = `http://api.weatherapi.com/v1/search.json?key=${API_KEY}&q=${query}`;
       const response = await fetch(request_url, { mode: "cors" });
-      const weatherData = await response.json();
+      const locationData = await response.json();
 
-      return weatherData;
+      return locationData;
     } catch (error) {
       this.#signalError(error.message);
       return false;
