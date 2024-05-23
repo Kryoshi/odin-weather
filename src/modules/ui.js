@@ -52,18 +52,7 @@ class UIComponent {
     });
   }
 
-  updateDashboard({ iconURL, location, temperature, miscData } = {}) {
-    if (iconURL) {
-      this.#dashboard.updateIcon(iconURL);
-    }
-    if (location) {
-      this.#dashboard.updateLocation(location);
-    }
-    if (temperature) {
-      this.#dashboard.updateTemperature(temperature);
-    }
-    if (miscData) {
-      this.#dashboard.updateMiscData(miscData);
-    }
+  updateDashboard(update) {
+    this.#dashboard.update(update);
   }
 }

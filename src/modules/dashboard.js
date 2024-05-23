@@ -42,6 +42,21 @@ class UIDashboard {
     this.weatherIcon.stopLoader();
   }
 
+  update({ iconURL, location, temperature, miscData } = {}) {
+    if (iconURL) {
+      this.updateIcon(iconURL);
+    }
+    if (location) {
+      this.updateLocation(location);
+    }
+    if (temperature) {
+      this.updateTemperature(temperature);
+    }
+    if (miscData) {
+      this.updateMiscData(miscData);
+    }
+  }
+
   updateIcon(url) {
     this.weatherIcon.setURL(url);
     this.stopLoading();
