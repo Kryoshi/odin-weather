@@ -1,0 +1,13 @@
+{
+  "API_KEY": "48d87e7905c448d39ba95320241305",
+  "STORAGE_KEYS": {
+    "timestamp": "time",
+    "location": "location",
+    "data": "data"
+  },
+  "REFRESH_MINUTES": 1,
+
+  "DAILY_HOURS": 24,
+  "HOUR_SECONDS": 3600,
+  "FORECAST_DAYS": 3
+}

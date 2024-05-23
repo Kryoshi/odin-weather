@@ -1,19 +1,10 @@
 import { storageAvailable } from "./storage";
 import WEATHERCONDITIONS from "../weather_api/weather_conditions";
+import C from "./constants.json";
+
+const REFRESH_INTERVAL = C.REFRESH_MINUTES * 60 * 1000; //(ms)
 
 export { Weather };
-
-const API_KEY = "48d87e7905c448d39ba95320241305";
-const STORAGE_KEYS = {
-  timestamp: "time",
-  location: "location",
-  data: "data",
-};
-const REFRESH_MINUTES = 1;
-const REFRESH_INTERVAL = REFRESH_MINUTES * 60 * 1000; //(ms)
-const DAILY_HOURS = 24;
-const HOUR_SECONDS = 3600;
-const FORECAST_DAYS = 3;
 
 class Weather {
   #data;
@@ -74,11 +65,11 @@ class Weather {
       const precipitationChance = {};
 
       const day = 0;
-      for (let hour = 0; hour < DAILY_HOURS; ++hour) {
+      for (let hour = 0; hour < C.DAILY_HOURS; ++hour) {
         let currentForecast = this.#data.forecast.forecastday[day].hour[hour];
 
         if (
-          this.#epoch_seconds - HOUR_SECONDS / 2 <
+          this.#epoch_seconds - C.HOUR_SECONDS / 2 <
           currentForecast.time_epoch
         ) {
           console.log(currentForecast.time);
@@ -177,7 +168,7 @@ class Weather {
     try {
       const request_url =
         "http://api.weatherapi.com/v1/search.json?" +
-        `key=${API_KEY}` +
+        `key=${C.API_KEY}` +
         `&q=${query}`;
       const response = await fetch(request_url, { mode: "cors" });
       const locationData = await response.json();
@@ -193,9 +184,9 @@ class Weather {
     try {
       const request_url =
         "http://api.weatherapi.com/v1/forecast.json?" +
-        `key=${API_KEY}` +
+        `key=${C.API_KEY}` +
         `&q=${this.#locationURL}` +
-        `&days=${FORECAST_DAYS}` +
+        `&days=${C.FORECAST_DAYS}` +
         `&aqi=yes`;
       const response = await fetch(request_url, { mode: "cors" });
       const weatherData = await response.json();
@@ -214,7 +205,7 @@ class Weather {
 
   #matchCacheLocation(locationURL) {
     if (storageAvailable) {
-      const cacheLocation = localStorage.getItem(STORAGE_KEYS.location);
+      const cacheLocation = localStorage.getItem(C.STORAGE_KEYS.location);
       if (cacheLocation) {
         if (locationURL === cacheLocation) {
           return true;
@@ -230,7 +221,7 @@ class Weather {
 
   #loadCacheLocation() {
     if (storageAvailable) {
-      const cacheLocation = localStorage.getItem(STORAGE_KEYS.location);
+      const cacheLocation = localStorage.getItem(C.STORAGE_KEYS.location);
       if (cacheLocation) {
         this.#locationURL = cacheLocation;
         return true;
@@ -245,7 +236,7 @@ class Weather {
 
   #canRefresh() {
     if (storageAvailable) {
-      const cacheTimestamp = localStorage.getItem(STORAGE_KEYS.timestamp);
+      const cacheTimestamp = localStorage.getItem(C.STORAGE_KEYS.timestamp);
 
       if (Date.now() - cacheTimestamp < REFRESH_INTERVAL) {
         return false;
@@ -260,8 +251,8 @@ class Weather {
 
   #loadCache() {
     if (storageAvailable) {
-      const cacheTimestamp = localStorage.getItem(STORAGE_KEYS.timestamp);
-      const dataString = localStorage.getItem(STORAGE_KEYS.data);
+      const cacheTimestamp = localStorage.getItem(C.STORAGE_KEYS.timestamp);
+      const dataString = localStorage.getItem(C.STORAGE_KEYS.data);
       const dataObject = JSON.parse(dataString);
 
       this.#epoch_seconds = Math.floor(cacheTimestamp / 1000);
@@ -279,9 +270,9 @@ class Weather {
       const cacheTimestamp = Date.now();
       this.#epoch_seconds = Math.floor(cacheTimestamp / 1000);
 
-      localStorage.setItem(STORAGE_KEYS.timestamp, cacheTimestamp);
-      localStorage.setItem(STORAGE_KEYS.location, this.#locationURL);
-      localStorage.setItem(STORAGE_KEYS.data, dataString);
+      localStorage.setItem(C.STORAGE_KEYS.timestamp, cacheTimestamp);
+      localStorage.setItem(C.STORAGE_KEYS.location, this.#locationURL);
+      localStorage.setItem(C.STORAGE_KEYS.data, dataString);
     } else {
       this.#signalError("Browser does not allow cache");
     }
