@@ -80,4 +80,8 @@ class UIComponent {
   updateHourlyForecast(update) {
     this.#hourlyForecast.update(update);
   }
+
+  loadingFailed() {
+    this.#dashboard.stopLoading();
+  }
 }

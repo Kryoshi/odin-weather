@@ -19,11 +19,39 @@ const REFRESH_INTERVAL = C.REFRESH_MINUTES * 60 * 1000; //(ms)
 
   signalLoadStart();
   if (await weather.loadData()) {
+    signalLoadSuccess();
+  } else {
+    signalLoadFail();
+  }
+
+  autoRefresh();
+
+  function signalLoadStart() {
+    const event = new Event("load-start");
+    uiInstance.window.dispatchEvent(event);
+  }
+
+  function signalLoadSuccess() {
     const event = new Event("load-success");
     uiInstance.window.dispatchEvent(event);
   }
 
-  autoRefresh();
+  function signalLoadFail() {
+    const event = new Event("load-fail");
+    uiInstance.window.dispatchEvent(event);
+  }
+
+  function signalError(message) {
+    const event = new CustomEvent("display-error", { detail: message });
+    uiInstance.window.dispatchEvent(event);
+  }
+
+  async function autoRefresh() {
+    await delay(REFRESH_INTERVAL);
+    const event = new Event("refresh");
+    uiInstance.window.dispatchEvent(event);
+    await autoRefresh();
+  }
 
   function initListeners() {
     uiInstance.window.addEventListener("search-query", async (e) => {
@@ -71,6 +99,7 @@ const REFRESH_INTERVAL = C.REFRESH_MINUTES * 60 * 1000; //(ms)
           uiInstance.window.dispatchEvent(event);
         } else {
           signalError("No matching location found");
+          signalLoadFail();
         }
       }
     });
@@ -81,8 +110,9 @@ const REFRESH_INTERVAL = C.REFRESH_MINUTES * 60 * 1000; //(ms)
 
         signalLoadStart();
         if (await weather.loadData(url)) {
-          const event = new Event("load-success");
-          uiInstance.window.dispatchEvent(event);
+          signalLoadSuccess();
+        } else {
+          signalLoadFail();
         }
       }
     });
@@ -93,29 +123,17 @@ const REFRESH_INTERVAL = C.REFRESH_MINUTES * 60 * 1000; //(ms)
       uiInstance.updateHourlyForecast(await weather.getHourlyForecastNow());
     });
 
+    uiInstance.window.addEventListener("load-fail", async () => {
+      uiInstance.loadingFailed();
+    });
+
     uiInstance.window.addEventListener("refresh", async () => {
       signalLoadStart();
       if (await weather.refresh()) {
-        const event = new Event("load-success");
-        uiInstance.window.dispatchEvent(event);
+        signalLoadSuccess();
+      } else {
+        signalLoadFail();
       }
     });
-  }
-
-  function signalLoadStart() {
-    const event = new Event("load-start");
-    uiInstance.window.dispatchEvent(event);
-  }
-
-  function signalError(message) {
-    const event = new CustomEvent("display-error", { detail: message });
-    uiInstance.window.dispatchEvent(event);
-  }
-
-  async function autoRefresh() {
-    await delay(REFRESH_INTERVAL);
-    const event = new Event("refresh");
-    uiInstance.window.dispatchEvent(event);
-    await autoRefresh();
   }
 })();
