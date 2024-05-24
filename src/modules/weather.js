@@ -272,7 +272,7 @@ class Weather {
   async #fetchLocations(query) {
     try {
       const request_url =
-        "http://api.weatherapi.com/v1/search.json?" +
+        "https://api.weatherapi.com/v1/search.json?" +
         `key=${C.API_KEY}` +
         `&q=${query}`;
       const response = await fetch(request_url, { mode: "cors" });
@@ -288,7 +288,7 @@ class Weather {
   async #fetchData() {
     try {
       const request_url =
-        "http://api.weatherapi.com/v1/forecast.json?" +
+        "https://api.weatherapi.com/v1/forecast.json?" +
         `key=${C.API_KEY}` +
         `&q=${this.#locationURL}` +
         `&days=${C.FORECAST_DAYS}` +
