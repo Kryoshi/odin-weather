@@ -5,7 +5,7 @@
     "location": "location",
     "data": "data"
   },
-  "REFRESH_MINUTES": 1,
+  "REFRESH_MINUTES": 5,
 
   "DAILY_HOURS": 24,
   "HOUR_SECONDS": 3600,

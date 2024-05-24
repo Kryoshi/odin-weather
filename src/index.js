@@ -3,6 +3,11 @@ import "./index.css";
 import { Weather } from "./modules/weather";
 import { UIComponent } from "./modules/ui";
 
+import { delay } from "./modules/delay.js";
+import C from "./modules/constants.json";
+
+const REFRESH_INTERVAL = C.REFRESH_MINUTES * 60 * 1000; //(ms)
+
 (async () => {
   const loader = document.querySelector(".pre-loader");
   loader.remove();
@@ -17,6 +22,8 @@ import { UIComponent } from "./modules/ui";
     const event = new Event("load-success");
     uiInstance.window.dispatchEvent(event);
   }
+
+  autoRefresh();
 
   function initListeners() {
     uiInstance.window.addEventListener("search-query", async (e) => {
@@ -85,15 +92,15 @@ import { UIComponent } from "./modules/ui";
       uiInstance.updateDailyForecast(await weather.getDailyForecast());
       uiInstance.updateHourlyForecast(await weather.getHourlyForecastNow());
     });
-  }
 
-  uiInstance.window.addEventListener("refresh", async () => {
-    signalLoadStart();
-    if (await weather.refresh()) {
-      const event = new Event("load-success");
-      uiInstance.window.dispatchEvent(event);
-    }
-  });
+    uiInstance.window.addEventListener("refresh", async () => {
+      signalLoadStart();
+      if (await weather.refresh()) {
+        const event = new Event("load-success");
+        uiInstance.window.dispatchEvent(event);
+      }
+    });
+  }
 
   function signalLoadStart() {
     const event = new Event("load-start");
@@ -103,5 +110,12 @@ import { UIComponent } from "./modules/ui";
   function signalError(message) {
     const event = new CustomEvent("display-error", { detail: message });
     uiInstance.window.dispatchEvent(event);
+  }
+
+  async function autoRefresh() {
+    await delay(REFRESH_INTERVAL);
+    const event = new Event("refresh");
+    uiInstance.window.dispatchEvent(event);
+    await autoRefresh();
   }
 })();
