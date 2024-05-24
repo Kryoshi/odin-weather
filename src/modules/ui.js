@@ -1,6 +1,8 @@
 import UNITS from "./units.json";
-import { UIDashboard } from "./dashboard";
 import { UIBackground } from "./background";
+import { UIDashboard } from "./dashboard";
+import { UIDailyForecastContainer } from "./forecast-daily";
+import { UIHourlyForecastContainer } from "./forecast-hourly";
 import { UIFooter } from "./footer";
 
 export { UIComponent };
@@ -9,6 +11,8 @@ class UIComponent {
   window;
   #background;
   #dashboard;
+  #dailyForecast;
+  #hourlyForecast;
   #footer;
   #displayUnits = UNITS.metric;
 
@@ -21,13 +25,20 @@ class UIComponent {
     this.#footer = new UIFooter();
 
     this.#dashboard = new UIDashboard();
+    this.#dailyForecast = new UIDailyForecastContainer();
+    this.#hourlyForecast = new UIHourlyForecastContainer();
 
     //Set attributes
     this.window.id = "window";
-    this.#dashboard.setUnits(this.#displayUnits);
+    this.window.className = "window";
+    this.updateUnits();
 
     //Append Elements
-    this.window.append(this.#dashboard.element);
+    this.window.append(
+      this.#dashboard.element,
+      this.#dailyForecast.element,
+      this.#hourlyForecast.element,
+    );
     body.append(this.#background.element, this.window, this.#footer.element);
 
     //Add listeners
@@ -44,7 +55,7 @@ class UIComponent {
         this.#displayUnits = UNITS.metric;
       }
 
-      this.#dashboard.setUnits(this.#displayUnits);
+      this.updateUnits();
     });
 
     this.window.addEventListener("load-start", () => {
@@ -52,7 +63,21 @@ class UIComponent {
     });
   }
 
+  updateUnits() {
+    this.#dashboard.setUnits(this.#displayUnits);
+    this.#dailyForecast.setUnits(this.#displayUnits);
+    this.#hourlyForecast.setUnits(this.#displayUnits);
+  }
+
   updateDashboard(update) {
     this.#dashboard.update(update);
+  }
+
+  updateDailyForecast(update) {
+    this.#dailyForecast.update(update);
+  }
+
+  updateHourlyForecast(update) {
+    this.#hourlyForecast.update(update);
   }
 }

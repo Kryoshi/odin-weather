@@ -4,7 +4,6 @@ class UIInformationComponent {
   element;
   #iconContainer;
   #icon;
-  #textContainer;
   #label;
   #content;
 
@@ -15,7 +14,6 @@ class UIInformationComponent {
     this.#iconContainer = document.createElement("div");
     this.#icon = document.createElement("div");
 
-    this.#textContainer = document.createElement("div");
     this.#label = document.createElement("span");
     this.#content = document.createElement("span");
 
@@ -30,8 +28,7 @@ class UIInformationComponent {
 
     //Append Elements
     this.#iconContainer.append(this.#icon);
-    this.#textContainer.append(this.#label, this.#content);
-    this.element.append(this.#iconContainer, this.#textContainer);
+    this.element.append(this.#iconContainer, this.#label, this.#content);
   }
 
   setLabel(text) {

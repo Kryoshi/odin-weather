@@ -81,30 +81,9 @@ import { UIComponent } from "./modules/ui";
     });
 
     uiInstance.window.addEventListener("load-success", async () => {
-      const dashboardUpdate = {};
-
-      const iconURL = await weather.getCurrentIconURL();
-      const location = await weather.getLocation();
-      const temperature = await weather.getCurrentTemperature();
-      const miscData = await weather.getWeatherMiscData();
-
-      if (iconURL) {
-        dashboardUpdate.iconURL = iconURL;
-      }
-
-      if (location) {
-        dashboardUpdate.location = location;
-      }
-
-      if (temperature) {
-        dashboardUpdate.temperature = temperature;
-      }
-
-      if (miscData) {
-        dashboardUpdate.miscData = miscData;
-      }
-
-      uiInstance.updateDashboard(dashboardUpdate);
+      uiInstance.updateDashboard(await weather.getCurrentData());
+      uiInstance.updateDailyForecast(await weather.getDailyForecast());
+      uiInstance.updateHourlyForecast(await weather.getHourlyForecastNow());
     });
   }
 

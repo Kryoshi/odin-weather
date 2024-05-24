@@ -12,6 +12,33 @@ class Weather {
   #epoch_seconds;
   searchCounter = 0;
 
+  async getCurrentData() {
+    const currentData = {};
+
+    const iconURL = await this.getCurrentIconURL();
+    const location = await this.getLocation();
+    const temperature = await this.getCurrentTemperature();
+    const miscData = await this.getWeatherMiscData();
+
+    if (iconURL) {
+      currentData.iconURL = iconURL;
+    }
+
+    if (location) {
+      currentData.location = location;
+    }
+
+    if (temperature) {
+      currentData.temperature = temperature;
+    }
+
+    if (miscData) {
+      currentData.miscData = miscData;
+    }
+
+    return currentData;
+  }
+
   async getLocation() {
     if (await this.loadData()) {
       return this.#data.location.name;
@@ -72,7 +99,6 @@ class Weather {
           this.#epoch_seconds - C.HOUR_SECONDS / 2 <
           currentForecast.time_epoch
         ) {
-          console.log(currentForecast.time);
           precipitationChance.rain = currentForecast.chance_of_rain;
           precipitationChance.snow = currentForecast.chance_of_snow;
           break;
@@ -92,8 +118,87 @@ class Weather {
     }
   }
 
+  async getDailyForecast() {
+    if (await this.loadData()) {
+      const dailyForecast = [];
+
+      for (let day of this.#data.forecast.forecastday) {
+        let dayForecast = day.day;
+        dailyForecast.push({
+          date: day.date,
+          maxTemperature: {
+            c: dayForecast.maxtemp_c,
+            f: dayForecast.maxtemp_f,
+          },
+          minTemperature: {
+            c: dayForecast.mintemp_c,
+            f: dayForecast.mintemp_f,
+          },
+          precipitationChance: {
+            rain: dayForecast.daily_chance_of_rain,
+            snow: dayForecast.daily_chance_of_snow,
+          },
+          iconURL: this.#generateIconURL(dayForecast),
+        });
+      }
+
+      return dailyForecast;
+    }
+  }
+
+  async getHourlyForecastNow() {
+    if (await this.loadData()) {
+      const hourlyForecast = [];
+
+      const maxHours = C.DAILY_HOURS;
+
+      let countedHours = 0;
+      let hour = 0;
+      let day = 0;
+
+      const checkEndofDay = () => {
+        if (hour === C.DAILY_HOURS) {
+          hour = 0;
+          day++;
+        }
+      };
+
+      while (countedHours < maxHours) {
+        let currentForecast = this.#data.forecast.forecastday[day].hour[hour];
+        if (this.#epoch_seconds > currentForecast.time_epoch) {
+          hour++;
+          checkEndofDay();
+          continue;
+        } else {
+          hourlyForecast.push({
+            time: currentForecast.time.split(" ")[1],
+            temperature: {
+              c: currentForecast.temp_c,
+              f: currentForecast.temp_f,
+            },
+            precipitationChance: {
+              rain: currentForecast.chance_of_rain,
+              snow: currentForecast.chance_of_snow,
+            },
+            iconURL: this.#generateIconURL(currentForecast),
+          });
+          countedHours++;
+          hour++;
+          checkEndofDay();
+        }
+      }
+
+      return hourlyForecast;
+    }
+  }
+
   #generateIconURL(forecastData) {
-    const dayStatus = forecastData.is_day ? "day" : "night";
+    let dayStatus;
+    if (forecastData.is_day != null && forecastData.is_day != undefined) {
+      dayStatus = forecastData.is_day ? "day" : "night";
+    } else {
+      dayStatus = "day";
+    }
     const iconCode = WEATHERCONDITIONS[forecastData.condition.code].icon;
 
     const iconURL = `./weather_icons/${dayStatus}/${iconCode}.png`;
